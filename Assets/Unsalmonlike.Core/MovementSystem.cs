@@ -1,16 +1,40 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.Burst;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
-using UnityEngine;
 
 namespace Unsalmonlike {
 	public partial struct MovementSystem : ISystem {
-		void ISystem.OnUpdate(ref Unity.Entities.SystemState state) {
-			//var randomComponent = SystemAPI.GetSingletonRW<RandomComponent>();
+		[BurstCompile]
+		void ISystem.OnUpdate(ref SystemState state) {
+			var randomComponent = SystemAPI.GetSingletonRW<RandomComponent>();
+			var deltaTime = SystemAPI.Time.DeltaTime;
 
-			//foreach (var moveToPositionAspect in SystemAPI.Query<MoveToPositionAspect>()) {
-			//	moveToPositionAspect.Move(SystemAPI.Time.DeltaTime, randomComponent);
-			//}
+			new MoveJob() {
+				deltaTime = deltaTime
+			}.ScheduleParallel(state.Dependency)
+			.Complete();
+
+			new TestReachedTargetPositionJob() {
+				randomComponent = randomComponent
+			}.Run();
 		}
+	}
+
+	[BurstCompile]
+	public partial struct MoveJob : IJobEntity {
+		public float deltaTime;
+
+		[BurstCompile]
+		public void Execute(MoveToPositionAspect moveToPositionAspect) =>
+			moveToPositionAspect.Move(deltaTime);
+	}
+
+	[BurstCompile]
+	public partial struct TestReachedTargetPositionJob : IJobEntity {
+		[NativeDisableUnsafePtrRestriction] public RefRW<RandomComponent> randomComponent;
+
+		[BurstCompile]
+		public void Execute(MoveToPositionAspect moveToPositionAspect) =>
+			moveToPositionAspect.TestReachedTargetPosition(randomComponent);
 	}
 }
