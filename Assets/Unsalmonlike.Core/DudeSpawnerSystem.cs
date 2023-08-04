@@ -1,16 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Burst;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
-using UnityEngine;
 
 namespace Unsalmonlike {
 	public partial struct DudeSpawnerSystem : ISystem {
 		[BurstCompile]
 		void ISystem.OnUpdate(ref SystemState state) {
-			var dudeQuery = state.EntityManager.CreateEntityQuery(typeof(DudeTag));
-			//var dudeQuery = SystemAPI.Query<DudeTag>();
+			var dudeQuery = SystemAPI.QueryBuilder().WithAll<DudeTag>().Build();
 			var spawner = SystemAPI.GetSingleton<DudeSpawner>();
 
 			var spawnAmount = 300;
