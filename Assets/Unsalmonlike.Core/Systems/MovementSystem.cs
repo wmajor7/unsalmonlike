@@ -6,8 +6,11 @@ namespace Unsalmonlike {
 	public partial struct MovementSystem : ISystem {
 		[BurstCompile]
 		void ISystem.OnUpdate(ref SystemState state) {
+			var gameState = SystemAPI.GetSingleton<GameState>();
 			var randomComponent = SystemAPI.GetSingletonRW<RandomComponent>();
 			var deltaTime = SystemAPI.Time.DeltaTime;
+
+			if (gameState.Value != GameStateValue.Running) return;
 
 			new MoveJob() {
 				deltaTime = deltaTime

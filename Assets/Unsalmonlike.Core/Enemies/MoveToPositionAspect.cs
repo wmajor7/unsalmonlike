@@ -16,7 +16,7 @@ namespace Unsalmonlike {
 
 		public void TestReachedTargetPosition(RefRW<RandomComponent> rnd) {
 			float reachedTargetDistance = .5f;
-			if (math.distance(localTransform.ValueRO.Position, targetPosition.ValueRW.Value) < reachedTargetDistance) {
+			if (math.distance(localTransform.ValueRO.Position, targetPosition.ValueRO.Value) < reachedTargetDistance) {
 				targetPosition.ValueRW.Value = GetRandomPosition(rnd);
 			}
 		}
